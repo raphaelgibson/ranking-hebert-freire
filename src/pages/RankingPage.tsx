@@ -1,31 +1,23 @@
 import { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
-import { Music } from '../Music'
 import { toast } from 'react-toastify'
+import Swal from 'sweetalert2'
+import { Music, type MusicData, type Vote } from '../Music'
 import Logo from '../assets/logo.png'
 import { api } from '../libs/axios'
-import { v4 as uuid4 } from 'uuid'
 
-export type MusicData = {
-  id: string
-  name: string
-  singer?: string
-  votes: number
-  visible: boolean
+type RankingPageProps = {
+  pageName: string
+  pageDescription: string
 }
 
-type Vote = {
-  musicId: string
-}
-
-export function ChannelRankingPage() {
+export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
   const [musics, setMusics] = useState<MusicData[]>([])
   const [filteredMusics, setFilteredMusics] = useState<MusicData[]>([])
   const [musicToSearch, setMusicToSearch] = useState('')
   const [singerToSearch, setSingerToSearch] = useState('')
 
   async function fetchAllMusics() {
-    const { data }: { data: MusicData[] } = await api.get('/api/musics')
+    const { data }: { data: MusicData[] } = await api.get(`/api/${pageName}`)
     const musicDataWithVisible = data.map(music => ({
       ...music,
       visible: true
@@ -79,7 +71,6 @@ export function ChannelRankingPage() {
 
     if (!foundSomeMusic) {
       musicsFound.push({
-        id: uuid4(),
         name: musicToSearch,
         singer: singerToSearch,
         votes: 0,
@@ -96,8 +87,8 @@ export function ChannelRankingPage() {
     setFilteredMusics([])
   }
 
-  async function handleVote(musicId: string, newMusic: MusicData | undefined = undefined) {
-    const userVoteData = localStorage.getItem('ranking-musicas-hebert-v1@userVoteData')
+  async function handleVote(musicId: string | undefined = undefined, newMusic: MusicData | undefined = undefined) {
+    const userVoteData = localStorage.getItem(`ranking-${pageName}-hebert-v1@userVoteData`)
     let voteData: Vote[] = []
 
     if (userVoteData) {
@@ -128,33 +119,42 @@ export function ChannelRankingPage() {
       }
     }
 
-    const vote = {
-      musicId: musicId
-    }
-
-    voteData.push(vote)
-
-    localStorage.setItem('ranking-musicas-hebert-v1@userVoteData', JSON.stringify(voteData))
     let updatedMusics: MusicData[]
 
     if (newMusic) {
-      newMusic.votes = 1
-      updatedMusics = [...musics, newMusic]
-      await api.post('/api/musics', newMusic)
+      try {
+        const { data } = await api.post<{ id: string; votes: number }>(`/api/${pageName}`, newMusic)
+        voteData.push({ musicId: data.id })
+        newMusic.id = data.id
+        newMusic.votes = data.votes
+        updatedMusics = [...musics, newMusic]
+      } catch (error) {
+        console.error(error)
+        throw error
+      }
     } else {
       updatedMusics = await Promise.all(
         musics.map(async oldMusic => {
           const updatedMusic = { ...oldMusic }
 
-          if (musicId === oldMusic.id) {
+          if (musicId && musicId === oldMusic.id) {
             updatedMusic.votes += 1
-            await api.put(`/api/musics/${updatedMusic.id}`, updatedMusic)
+            voteData.push({ musicId })
+
+            try {
+              await api.put(`/api/${pageName}/${updatedMusic.id}/vote`)
+            } catch (error) {
+              console.error(error)
+              throw error
+            }
           }
 
           return updatedMusic
         })
       )
     }
+
+    localStorage.setItem(`ranking-${pageName}-hebert-v1@userVoteData`, JSON.stringify(voteData))
 
     updatedMusics.sort((a, b) => {
       if (b.votes !== a.votes) {
@@ -175,7 +175,7 @@ export function ChannelRankingPage() {
         <img src={Logo} alt="" />
       </header>
       <main>
-        <h1>Aqui os fãs de Hebert Freire têm o poder de escolher as próximas músicas do canal!</h1>
+        <h1>{pageDescription}</h1>
 
         <div className="musicsContainer">
           <div className="formContainer">
@@ -216,11 +216,11 @@ export function ChannelRankingPage() {
                 {filteredMusics.length > 0
                   ? filteredMusics.map((music, index) => {
                       if (music.visible) {
-                        return <Music key={music.id} music={music} index={index} handleVote={handleVote} />
+                        return <Music key={music.id || '123'} music={music} index={index} handleVote={handleVote} />
                       }
                     })
                   : musics.map((music, index) => {
-                      return <Music key={music.id} music={music} index={index} handleVote={handleVote} />
+                      return <Music key={music.id || '123'} music={music} index={index} handleVote={handleVote} />
                     })}
               </tbody>
             </table>

@@ -1,9 +1,19 @@
-import type { MusicData } from './pages/PraisesRankingPage'
+export type MusicData = {
+  id?: string
+  name: string
+  singer?: string
+  votes: number
+  visible: boolean
+}
+
+export type Vote = {
+  musicId: string
+}
 
 type MusicProps = {
   music: MusicData
   index: number
-  handleVote: (musicId: string, newMusic: MusicData | undefined) => void
+  handleVote: (musicId: string | undefined, newMusic: MusicData | undefined) => void
 }
 
 export function Music({ music, index, handleVote }: MusicProps) {

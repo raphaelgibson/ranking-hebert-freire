@@ -1,2 +1,1 @@
-export { ChannelRankingPage } from './ChannelRankingPage'
-export { PraisesRankingPage } from './PraisesRankingPage'
+export { RankingPage } from './RankingPage'
