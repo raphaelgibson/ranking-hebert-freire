@@ -227,11 +227,6 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
           </div>
         </div>
       </main>
-
-      <footer>
-        <span>Desenvolvido com ❤ por Raphael Gibson</span>
-        <span>Contato: raphaelgibson1998@gmail.com</span>
-      </footer>
     </div>
   )
 }
