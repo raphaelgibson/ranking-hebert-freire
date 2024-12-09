@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import Swal from 'sweetalert2'
@@ -26,6 +26,7 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
   const [singerToSearch, setSingerToSearch] = useState('')
   const [selectedMusicToUpdate, setSelectedMusicToUpdate] = useState<MusicDataUpdate | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isUpdatingMusic, setIsUpdatingMusic] = useState(false)
   const navigate = useNavigate()
 
   const unexpectedErrorMessage = 'Ocorreu um erro inesperado, tente novamente mais tarde.'
@@ -196,7 +197,10 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
     setMusics(updatedMusics)
   }
 
-  async function handleUpdate(musicDataUpdate: MusicDataUpdate): Promise<void> {
+  async function handleUpdate(event: FormEvent<HTMLFormElement>, musicDataUpdate: MusicDataUpdate): Promise<void> {
+    setIsUpdatingMusic(true)
+    event.preventDefault()
+
     try {
       await api.put(`/api/${pageName}/${musicDataUpdate.id}`, musicDataUpdate, {
         headers: {
@@ -286,10 +290,12 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
   function closeDialog() {
     setSelectedMusicToUpdate(null)
     setIsDialogOpen(false)
+    setIsUpdatingMusic(false)
   }
 
   async function handleSyncRanking() {
     setFilteredMusics([])
+
     try {
       await fetchAllMusics()
       toast.success('Ranking atualizado!', {
@@ -399,15 +405,22 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
               {selectedMusicToUpdate && (
                 <Dialog.Portal>
                   <Dialog.Content className="dialogContent">
-                    <Dialog.Title className="dialogTitle">Atualizar música</Dialog.Title>
+                    <Dialog.Title className="dialogTitle">
+                      {isUpdatingMusic ? 'Atualizando...' : 'Atualizar música'}
+                    </Dialog.Title>
                     <Dialog.Description />
 
-                    <form autoCapitalize="words" autoComplete="off">
+                    <form
+                      autoCapitalize="words"
+                      autoComplete="off"
+                      onSubmit={(event: FormEvent<HTMLFormElement>) => handleUpdate(event, selectedMusicToUpdate)}
+                    >
                       <div className="formContainer">
                         <input
                           id="nameToUpdate"
                           type="text"
                           placeholder="Informe o nome da música"
+                          required
                           value={selectedMusicToUpdate.name}
                           onChange={e => setSelectedMusicToUpdate({ ...selectedMusicToUpdate, name: e.target.value })}
                         />
@@ -424,15 +437,9 @@ export function RankingPage({ pageName, pageDescription }: RankingPageProps) {
                               Cancelar
                             </button>
                           </Dialog.Close>
-                          <Dialog.Close asChild>
-                            <button
-                              type="button"
-                              className="primaryButton"
-                              onClick={() => handleUpdate(selectedMusicToUpdate)}
-                            >
-                              Atualizar
-                            </button>
-                          </Dialog.Close>
+                          <button type="submit" className="primaryButton">
+                            Atualizar
+                          </button>
                         </div>
                       </div>
                     </form>

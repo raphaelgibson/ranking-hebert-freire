@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import HebertFreire from '../../assets/hebert-freire.png'
@@ -11,7 +11,17 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  async function handleLogin() {
+  useEffect(() => {
+    const userData = localStorage.getItem('rankings-hebert-v1@userData')
+
+    if (userData) {
+      navigate('/')
+    }
+  }, [])
+
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
     try {
       const {
         data: { accessToken }
@@ -39,21 +49,34 @@ export function LoginPage() {
           <img src={HebertFreire} alt="" width={300} />
         </div>
 
-        <div className="formContainer">
+        <form className="formContainer" onSubmit={handleLogin}>
           <div className="formGroup">
             <label htmlFor="email">E-mail</label>
-            <input type="email" id="email" autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
+            <input
+              type="email"
+              id="email"
+              autoComplete="off"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
           </div>
 
           <div className="formGroup">
             <label htmlFor="password">Senha</label>
-            <input type="password" id="password" value={password} onChange={e => setPassword(e.target.value)} />
+            <input
+              type="password"
+              id="password"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
           </div>
 
-          <button className="signinButton" type="button" onClick={handleLogin}>
+          <button className="signInButton" type="submit">
             Entrar
           </button>
-        </div>
+        </form>
       </main>
     </div>
   )
