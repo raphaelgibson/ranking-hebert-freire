@@ -1,0 +1,58 @@
+.hebertFreire {
+  margin: 2rem 0;
+  max-width: 300px;
+}
+
+.formContainer {
+  width: 300px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  label {
+    color: #d6d6d6;
+    font-size: 0.875rem;
+  }
+
+  input {
+    border: 0;
+    outline: 1px solid #121212;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    padding: .75rem;
+    background-color: #121212;
+    color: #c1c1c1;
+    box-shadow: rgba(0, 0, 0, 0.7) 1px 3px 5px;
+
+    &:focus-within {
+      outline: 1px solid #c202ff;
+    }
+  }
+
+  .signinButton {
+    min-width: 120px;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: white;
+    background-color: #c202ff;
+    padding: 12px 8px;
+    border: 2px solid #c202ff;
+    border-radius: 30px;
+
+    &:hover {
+      background-color: #db67ff;
+      cursor: pointer;
+    }
+  }
+
+  @media (min-width: 768px) {
+    width: 350px;
+  }
+}

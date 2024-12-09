@@ -1,0 +1,35 @@
+.primaryButton {
+  font-size: 1.25rem;
+  color: white;
+  background-color: #c202ff;
+  border: 2px solid #c202ff;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: #db67ff;
+    cursor: pointer;
+  }
+}
+
+.secondaryButton {
+  font-size: 1.25rem;
+  color: white;
+  background-color: transparent;
+  border: 2px solid #c202ff;
+  border-radius: 8px;
+
+  &:hover {
+    color: #db67ff;
+    cursor: pointer;
+  }
+}
+
+.dialogOverlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  inset: 0;
+}
+
+.updateRankingButton {
+  padding: 8px;
+}

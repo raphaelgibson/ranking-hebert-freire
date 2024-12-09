@@ -1,0 +1,22 @@
+header {
+  position: initial;
+  top: 0;
+  background-color: #121212;
+  width: 100vw;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-width: 300px;
+  }
+
+  @media (min-width: 768px) {
+    position: fixed;
+
+    img {
+      max-width: 400px;
+    }
+  }
+}

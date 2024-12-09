@@ -1,6 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-
-import { RankingPage } from './pages'
+import { LoginPage, RankingPage } from './pages'
 
 export const AppRouter: React.FC = () => {
   return (
@@ -24,6 +23,7 @@ export const AppRouter: React.FC = () => {
             />
           }
         />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </Router>
   )

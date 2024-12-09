@@ -1,3 +1,6 @@
+import { Pencil, Trash } from 'phosphor-react'
+import './styles.scss'
+
 export type MusicData = {
   id?: string
   name: string
@@ -13,10 +16,13 @@ export type Vote = {
 type MusicProps = {
   music: MusicData
   index: number
+  user?: any
   handleVote: (musicId: string | undefined, newMusic: MusicData | undefined) => void
+  handleDelete: (musicId: string | undefined) => Promise<void>
+  onEdit: () => void
 }
 
-export function Music({ music, index, handleVote }: MusicProps) {
+export function Music({ music, index, user, handleVote, handleDelete, onEdit }: MusicProps) {
   const newMusic = music.votes === 0 ? music : undefined
 
   return (
@@ -34,10 +40,24 @@ export function Music({ music, index, handleVote }: MusicProps) {
       )}
       <td>{music.votes}</td>
       <td>
-        <button type="button" onClick={() => handleVote(music.id, newMusic)}>
+        <button type="button" className="voteButton" onClick={() => handleVote(music.id, newMusic)}>
           Votar
         </button>
       </td>
+      {user && music.id && (
+        <>
+          <td>
+            <button type="button" className="iconButton" onClick={onEdit}>
+              <Pencil size={24} color="green" />
+            </button>
+          </td>
+          <td>
+            <button type="button" className="iconButton" onClick={() => handleDelete(music.id)}>
+              <Trash size={24} color="#972b20" />
+            </button>
+          </td>
+        </>
+      )}
     </tr>
   )
 }
